@@ -1,0 +1,17 @@
+{
+  "name": "beuthbot.gateway.package",
+  "version": "1.0.1",
+  "description": "Package for Beuthbot Gateway",
+  "main": "gateway.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start" : "node gateway.js"
+  },
+  "author": "Christopher Lehmann",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  }
+}
