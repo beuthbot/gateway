@@ -1,0 +1,20 @@
+# https://docs.docker.com/compose/compose-file/
+version: "2.0"
+
+services:
+  gateway-microservice:
+    container_name: gateway-microservice
+    privileged: true
+    build:
+      context: ./
+    restart: always
+    networks:
+      - web
+    expose:
+      - 9000
+    volumes:
+      - .:/app
+
+networks:
+  web:
+    external: true
