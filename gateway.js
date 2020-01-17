@@ -28,12 +28,14 @@ app.use(
 
 // the route the API will call:
 app.post('/message-in', function(req, res) {
-	const { message } = req.body // message object
+	//console.log(typeof req.body)
+	//console.log(req.body)
+	const message = req.body.data.message // message object
 
 	if (!message || message.text.length < 1) { // if message is not present or message text is empty
 		return res.end() // return empty response
 	}
-
+	
 	const options = { // options object (especially headers for POST)
 		headers: {
 			'Host': 'northeurope.api.cognitive.microsoft.com',
@@ -41,6 +43,8 @@ app.post('/message-in', function(req, res) {
 			'Ocp-Apim-Subscription-Key': '54dbb69669be4638b704460c96e8c8f3'
 		}
 	}
+	
+	console.debug(message)
 
 	axios
 	.post( // POST -> Microsoft Azure - Cognitive Services | NLU | (Response = json[entities, content, score, ...])
@@ -54,12 +58,17 @@ app.post('/message-in', function(req, res) {
 		}, options
 	)
 	
+	.catch(function (error) {
+    // handle error
+    console.log(error);
+	})
+	
 	.then(function (response) {
 		message_out = "[" + message.chat.id + "]: " + "Hi, your score is " + response.data.documents[0].score + "."
 		
 		axios
 		.post( // nested chat answer to avoid missing Azure response
-			'https://api.telegram.org/bot916877791:AAEcIVYenYLjbjt7xzAr4fan6SlDIxzlDz4/sendMessage',
+			'https://api.telegram.org/bot1008019346:AAHZ-PALIP0-TcCq5r90u3A5ekc1JvbdTy4/sendMessage',
 			{
 				chat_id: message.chat.id,
 				text: message_out
@@ -70,6 +79,8 @@ app.post('/message-in', function(req, res) {
 			console.log('Message posted')
 			res.end('ok')
 		})
+		
+		//console.log(message_out)
 	})
 })
 
