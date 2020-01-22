@@ -89,5 +89,5 @@ app.post('/message-in', function(req, res) {
 
 // start server
 app.listen(3000, function() {
-	console.log('Telegram app listening on port 3000!')
+	console.log('Gateway app listening on port 3000!')
 })
