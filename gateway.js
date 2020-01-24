@@ -14,6 +14,7 @@
 
 // load modules (node.js):
 const axios = require('axios')
+const util = require('util')
 var express = require('express')
 var bodyParser = require('body-parser')
 
@@ -34,60 +35,55 @@ app.post('/message-in', function(req, res) {
 		return res.end() // return empty response
 	}
 	
-	const options = { // options object (specific headers for Azure POST)
-		headers: { // Ocp-Apim-Subscription-Key | 12abc34567de8910f123456g78h9i1j0 [sample key]
-			'Host': 'northeurope.api.cognitive.microsoft.com',
-			'Content-Type': 'application/json',
-			'Ocp-Apim-Subscription-Key': '<key>'
-		}
-	}
 
-	// TODO replace Azure with Rasa [or adapter]
-	
+	// step one: send to deconcentrator, hope for the best.
 	axios
-	.post( // POST -> Microsoft Azure - Cognitive Services | NLU | (Response = json[entities, content, score, ...])
-		'https://northeurope.api.cognitive.microsoft.com/text/analytics/v2.1/sentiment',
+	.post(
+		process.env.DECONCENTRATOR_ENDPOINT,
 		{
-			"documents": [{
-				"language": "en",
-				"id": message.chat.id,
-				"text": message.text
-			}]
-		}, options
+			"payload": {
+				"type": "text",
+				"data": Buffer.from(message.text).toString('base64')
+			},
+			"args": [],
+			"kwargs": {
+				"sync": true, // causes the request to be processed in-sync (instead of async). 
+				// "callback": "some-url", // can be used to push state upon progress (most useful in async mode)
+				"confidence_score": 0.8 // minimum score to reach, if possible. useful if multiple endpoints available
+			},
+			"strategy": "objectivesstrategiesnlu_score"
+		}
 	)
 	
 	.catch(function (error) {
-    // handle error
-    console.log(error);
+		console.error(error)
 	})
 	
-	// TODO send response to registry
-	
-	.then(function (response) { // reply to user [chat]
-		message_out = "[" + message.chat.id + "]: " + "Hi, your score is " + response.data.documents[0].score + "."
-		
-		// TODO adjust answer mechanism
-		
-		axios
-		.post( // nested chat answer to avoid missing Azure response
-			'https://api.telegram.org/bot<token>/sendMessage',
-			{
-				chat_id: message.chat.id,
-				text: message_out
-			}
+	.then(function (deconResponse) { 
+		// step two: forward to registry
+		intent = deconResponse.data.jobs[0].results[0].payload.intent.name
+		confidence = deconResponse.data.jobs[0].results[0].payload.intent.confidence
+		message_out = "[" + message.chat.id + "]: " + "Your intent: " + intent + ", confidence: " + confidence + "."
+		console.debug(message_out)
+
+		axios.post(
+			process.env.REGISTRY_ENDPOINT,
+			deconResponse.data.jobs[0].results[0].payload
 		)
-		
-		.then(response => { // if the message was successfully posted
-			console.log('Message posted')
-			res.end('ok')
+		.catch(function(error) {
+			console.error(error)
+		})
+		.then(function(regResponse) {
+			// step three: build answer to send back to the bot
+//			console.debug(util.inspect(regResponse, false, null, true))
+			console.debug(regResponse.data.answer)
+			regResponse.data.answer.history.push('gateway')
+			res.json(regResponse.data.answer)
+			res.end()
 		})
 	})
 })
 
-// outsource code [deprecated]
-// function evaluate(message) { }
-
-// start server
 app.listen(3000, function() {
 	console.log('Gateway app listening on port 3000!')
 })
