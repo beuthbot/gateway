@@ -102,5 +102,5 @@ The `.env` file of the gateway needs to specify the URLs of the endpoints of the
 ```dotenv
 DECONCENTRATOR_ENDPOINT=http://0.0.0.0:8338/message
 REGISTRY_ENDPOINT=http://host.docker.internal:9922/get-response
+DATABASE_ENDPOINT=http://host.docker.internal:27000
 ```
-
