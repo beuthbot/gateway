@@ -24,7 +24,7 @@ BeuthBot Gateway written in JavaScript. The Gateway is the central endpoint for 
 
 ## API
 
-There is just one url you can post a message against:
+There is just one url you can post a message to.
 ```http
 POST http://<YOUR_GATEWAY_URL>:3000/message
 ```
@@ -36,20 +36,20 @@ POST http://<YOUR_GATEWAY_URL>:3000/message
 ```json
 {
    "text": "Wie wird das Wetter morgen?",
-   "telegram-id": 12345,
+   "telegramId": 12345,
    ...
 }
 ```
 
-| Property      | Type                 | About                                     |
-| ------------- | -------------------- | ----------------------------------------- |
-| text          | `String`             | The actual text for the bot.              |
-| telegram-id   | `Integer` (optional) | The telegram id of the user.              |
-| nickname      | `String` (optional)  | A possible nickname of the user.          |
-| first-name    | `String` (optional)  | A possible first name of the user.        |
-| last-name     | `String` (optional)  | A possible last name of the user.         |
-| client-date   | `Timestamp` (option) | The current date of the client app / bot. |
-| client-secret | `String` (optional)  | The client's api key.                     |
+| Property     | Type                 | About                                     |
+| ------------ | -------------------- | ----------------------------------------- |
+| text         | `String`             | The actual text for the bot.              |
+| telegramId   | `Integer` (optional) | The telegram id of the user.              |
+| nickname     | `String` (optional)  | A possible nickname of the user.          |
+| firstName    | `String` (optional)  | A possible first name of the user.        |
+| lastName     | `String` (optional)  | A possible last name of the user.         |
+| clientDate   | `Timestamp` (option) | The current date of the client app / bot. |
+| clientSecret | `String` (optional)  | The client's api key.                     |
 
 
 Whereas everything except of the `text` property is optional. So at a bare minimum a body of a request could looks like the following.

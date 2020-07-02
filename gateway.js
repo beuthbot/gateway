@@ -13,31 +13,28 @@
 const axios = require('axios')
 const util = require('util')
 
-// holds the URL of the deconcentrator endpoint
 const deconcentratorEndpoint = process.env.DECONCENTRATOR_ENDPOINT || "http://localhost:8338/message"
-
-// holds the URL of the registry endpoint
 const registryEndpoint = process.env.REGISTRY_ENDPOINT || "http://localhost:9922/get-response"
+const databaseEndpoint = process.env.DATABASE_ENDPOINT || "http://localhost:27000"
 
 // use express app for hadling incoming requests
 const express = require('express')
+const app = express()
 
 // use body parser to for application/json contents foor express
 const bodyParser = require('body-parser')
-
-// create express application
-const app = express()
-
 // for parsing application/json
 app.use(bodyParser.json())
-
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
+
+
 
 app.get('/', function(req, res) {
 	res.send('Hello from BeuthBot Gateway')
 	res.end()
 })
+
 
 // the route the API will call:
 app.post('/message', function(req, res) {
@@ -60,10 +57,15 @@ app.post('/message', function(req, res) {
 	axios
 	.post(deconcentratorEndpoint, { "text": message.text })
 	.catch(function (error) {
-		console.error("error when requesting deconcentrator. is it running?")
-		console.error(error)
+		console.error("ERROR when requesting deconcentrator. is it running?")
 	})
 	.then(function (deconcentratorResponse) {
+
+		if (!deconcentratorResponse) {
+			res.json({ "content": "No Data." })
+			res.end()
+			return
+		}
 
 		const deconcentratorAnswer = deconcentratorResponse.data
 		console.log('deconcentratorAnswer: ', deconcentratorAnswer)
@@ -72,7 +74,8 @@ app.post('/message', function(req, res) {
 
 		if (!intent) {
 			res.json({ "content": "No intent found." })
-			return res.end()
+			res.end()
+			return
 		}
 
 		const confidence = intent.confidence
@@ -86,7 +89,7 @@ app.post('/message', function(req, res) {
 
 			const registryAnswer = registryResponse.data
 
-			console.debug("registry answer: " + util.inspect(registryAnswer, false, null, true))
+			console.debug("registry answer: \n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
 
 			if (registryAnswer.answer.history) {
 				registryAnswer.answer.history.push('gateway')

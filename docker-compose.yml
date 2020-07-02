@@ -8,4 +8,8 @@ services:
     environment:
       - DECONCENTRATOR_ENDPOINT
       - REGISTRY_ENDPOINT
-
+      - DATABASE_ENDPOINT
+networks:
+  default:
+    external:
+      name: beuthbot_network
