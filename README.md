@@ -1,80 +1,106 @@
 # gateway
-BeuthBot Gateway written in JavaScript. The Gateway is the
-central endpoint for client bots to communicate with the 
-BeuthBot.
 
-# API
+![Icon](.documentation/Icon100.png "Icon")
+
+BeuthBot Gateway written in JavaScript. The Gateway is the central endpoint for client bots to communicate with the BeuthBot.
+
+## Contents
+
+* [Getting Startet](#Getting-Startet)
+* [API](#API)
+  * [Request Body](#Request-Body)
+  * [Response](#Response)
+  * [`curl` Example](#curl-Example)
+* [Dot Env](#Dot-Env)
+
+
+
+### Functionality
+
+![function](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/gateway/master/.documentation/uml/function.txt)
+
+
+
+
+## API
+
 There is just one url you can post a message against:
-```shell script
+```http
 POST http://<YOUR_GATEWAY_URL>:3000/message
 ```
 
-## `Message` - Request Model
-```json
-{
-  "message_id": 1006,
-  "from":
-    {
-      "first_name": "Alan",
-      "last_name": "Turing",
-      "nickname": "Al"
-    },
-  "chat":
-    {
-      "first_name": "Alan",
-      "last_name": "Turing",
-      "nickname": "Al"
-    },
-  "date": 1590059247,
-  "text": "Wie wird das Wetter morgen?",
-  "client_language": "de",
-  "client_secret": "1a2b3c4e5g6h7i8j9k0l1a2b3c4e5g6h7i8j9k0l"
-}
-```
-Whereas everything except of the `text` property is optional. So at
-a bare minimum a body of a request could looks like:
-```json
-{
-  "text": "Wie wird das Wetter morgen?"
-}
-```
-Sending a message like this the bot won't have much information about
-a context like with whom he is chatting or e.g. the date of the
-client application. Thus he won't give a good answer.
 
-## `Answer` - Response Model
+
+### Request Body
+
 ```json
 {
-  "message_id": 1006,
-  "from":
-    {
-      "first_name": "Alan",
-      "last_name": "Turing",
-      "nickname": "Al"
-    },
-  "chat":
-    {
-      "first_name": "Alan",
-      "last_name": "Turing",
-      "nickname": "Al"
-    },
-  "date": 1590059247,
-  "text": "Wie wird das Wetter morgen?",
-  "answer":
-    {
+   "text": "Wie wird das Wetter morgen?",
+   "telegram-id": 12345,
+   ...
+}
+```
+
+| Property      | Type                 | About                                     |
+| ------------- | -------------------- | ----------------------------------------- |
+| text          | `String`             | The actual text for the bot.              |
+| telegram-id   | `Integer` (optional) | The telegram id of the user.              |
+| nickname      | `String` (optional)  | A possible nickname of the user.          |
+| first-name    | `String` (optional)  | A possible first name of the user.        |
+| last-name     | `String` (optional)  | A possible last name of the user.         |
+| client-date   | `Timestamp` (option) | The current date of the client app / bot. |
+| client-secret | `String` (optional)  | The client's api key.                     |
+
+
+Whereas everything except of the `text` property is optional. So at a bare minimum a body of a request could looks like the following.
+
+```json
+{ "text": "Wie wird das Wetter morgen?" }
+```
+> Sending a message like this the bot won't have much information about a context like with whom he is chatting or e.g. the date of the client application. Thus he won't give a good answer.
+
+
+
+### Response
+
+```json
+{
+   "text": "Wie wird das Wetter morgen?",
+   "answer" : {
       "content" : "Morgen gibt es Sonnenschein bei 29 Grad.",
-      "history" : ["WeatherService", "registry", "gateway"]
-    }
+      "history" : ["gateway", "registry", "weather-microservice"]
+   },
+   ...
 }
 ```
 
-# `.env` - Environment
-The `.env` file of the gateway needs to specify the URLs of the
-endpoints of the deconcentrator and of the registry. The default
-port for the deconcentrator is `8338` and for the registry is `9922`.
-You may edit it dependant on you needs. Have alook
+| Property       | Type                | About                                                        |
+| -------------- | ------------------- | ------------------------------------------------------------ |
+| text           | `String`            | The actual text for the bot.                                 |
+| answer.content | `String` (optional) | The answer of the bot.                                       |
+| answer.history | `String` (optional) | A trace of the services the message passed till the <br>answer. |
+
+
+
+### `curl` Example
+
+
+
+```shell
+curl http://localhost:3000/message \
+		-X POST \
+    -H "Content-Type: application/json" \
+    --data "{\"text\":\"Wie wird das Wetter morgen?\"}"
+```
+
+
+
+## Dot Env
+
+The `.env` file of the gateway needs to specify the URLs of the endpoints of the deconcentrator and of the registry. The default port for the deconcentrator is `8338` and for the registry is `9922`. You may edit it dependant on you needs.
 
 ```dotenv
 DECONCENTRATOR_ENDPOINT=http://0.0.0.0:8338/message
 REGISTRY_ENDPOINT=http://host.docker.internal:9922/get-response
 ```
+

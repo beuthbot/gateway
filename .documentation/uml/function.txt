@@ -1,0 +1,35 @@
+@startuml
+actor User
+
+box "BeuthBot" #LightBlue
+participant "gateway" as GW
+participant "deconcentrator.js" as DC
+participant "databse" as DB
+participant "registry" as RE
+
+end box
+
+User -> GW: message
+activate GW
+
+GW -> DC: request \ninterpretation
+activate DC
+DC -> DC: NLU \nprocessing
+DC -> GW: intent
+deactivate DC
+
+GW -> DB: request user
+activate DB
+DB -> DB: lookup user
+DB -> GW: user
+deactivate DB
+
+GW -> RE: intent + user
+activate RE
+RE -> RE: send to \nmicroservice
+RE -> GW: answere
+deactivate RE
+
+GW -> User: answere
+deactivate GW
+@enduml
