@@ -17,7 +17,7 @@ BeuthBot Gateway written in JavaScript. The Gateway is the central endpoint for 
 
 ### Functionality
 
-![function](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/gateway/master/.documentation/uml/function.txt)
+![function](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/beuthbot/gateway/master/.documentation/uml/function.txt)
 
 
 
