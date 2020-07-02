@@ -4,7 +4,7 @@ actor User
 box "BeuthBot" #LightBlue
 participant "gateway" as GW
 participant "deconcentrator.js" as DC
-participant "databse" as DB
+participant "database" as DB
 participant "registry" as RE
 
 end box
