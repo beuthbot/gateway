@@ -10,34 +10,27 @@
  */
 
 // load node.js modules
-const axios = require('axios')
+const express = require('express')
+const bodyParser = require('body-parser')
 const util = require('util')
 
-const deconcentratorEndpoint = process.env.DECONCENTRATOR_ENDPOINT || "http://localhost:8338/message"
-const registryEndpoint = process.env.REGISTRY_ENDPOINT || "http://localhost:9922/get-response"
-const databaseEndpoint = process.env.DATABASE_ENDPOINT || "http://localhost:27000"
+const deconcentrator = require('./app/deconcentrator')
+const registry = require('./app/registry')
+const database = require('./app/database')
 
-// use express app for hadling incoming requests
-const express = require('express')
-const app = express()
-
-// use body parser to for application/json contents foor express
-const bodyParser = require('body-parser')
+const expressApp = express()
 // for parsing application/json
-app.use(bodyParser.json())
+expressApp.use(bodyParser.json())
 // for parsing application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+expressApp.use(bodyParser.urlencoded({ extended: true }))
 
-
-
-app.get('/', function(req, res) {
+expressApp.get('/', function(req, res) {
     res.send('Hello from BeuthBot Gateway')
     res.end()
 })
 
-
 // the route the API will call:
-app.post('/message', function(req, res) {
+expressApp.post('/message', function(req, res) {
 
     // top JSON object is our message.  see README.md for definition
     const message = req.body
@@ -48,60 +41,65 @@ app.post('/message', function(req, res) {
 
     // guard the existence of a valid text content
     if (!text || text.length < 1) {
-        res.json({ "content": "Can't find text message!" })
-        // return empty response
-        return res.end()
+        message.error = "message has no text property"
+        message.answer = {
+            "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten.",
+            "history": ["gateway"]
+        }
+        res.json(message)
+        res.end();
+        return
     }
 
-    // step one: send to deconcentrator, hope for the best.
-    axios
-        .post(deconcentratorEndpoint, { "text": message.text })
-        .catch(function (error) {
-            console.error("ERROR when requesting deconcentrator. is it running?")
-        })
+    const deconcentratorMessage = {}
+    deconcentratorMessage.text = text
+    deconcentratorMessage.min_confidence_score = 0.75
+    deconcentratorMessage.processors = ["rasa"]
+    deconcentratorMessage.history = ["gateway"]
+
+    deconcentrator
+        .interpretate(deconcentratorMessage)
         .then(function (deconcentratorResponse) {
 
-            if (!deconcentratorResponse) {
-                res.json({ "error": "no data." })
+            return registry.postMessage(deconcentratorResponse.data)
+
+        })
+        .then(function (registryResponse) {
+
+            if (!registryResponse || !registryResponse.data) {
+                message.answer = {
+                    "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten.",
+                    "history": ["gateway"]
+                }
+                res.json(message)
                 res.end()
                 return
             }
 
-            const deconcentratorAnswer = deconcentratorResponse.data
-            console.log('deconcentratorAnswer: ', deconcentratorAnswer)
+            const registryAnswer = registryResponse.data
 
-            const intent = deconcentratorAnswer.intent
+            console.debug("registryAnswer:\n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
 
-            if (!intent) {
-                res.json({ "content": "No intent found." })
-                res.end()
-                return
+            if (registryAnswer.answer.history) {
+                registryAnswer.answer.history.push('gateway')
             }
 
-            const confidence = intent.confidence
-            console.log("found intent: " + intent.name + ", confidence: " + confidence + ".")
+            res.json(registryAnswer)
+            res.end()
 
-            axios.post(registryEndpoint, deconcentratorAnswer)
-                .catch(function(error) {
-                    console.error(error)
-                })
-                .then(function(registryResponse) {
-
-                    const registryAnswer = registryResponse.data
-
-                    console.debug("registry answer: \n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
-
-                    if (registryAnswer.answer.history) {
-                        registryAnswer.answer.history.push('gateway')
-                    }
-
-                    res.json(registryAnswer)
-                    res.end()
-                })
+        })
+        .catch(function (error) {
+            console.log(error)
+            message.error = String(error)
+            message.answer = {
+                "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten.",
+                "history": ["gateway"]
+            }
+            res.json(message)
+            res.end();
         })
 })
 
-// start running the express application listening on port 3000
-app.listen(3000, function() {
+expressApp.listen(3000, function() {
     console.log('Gateway listening on port 3000!')
 })
