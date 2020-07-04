@@ -71,8 +71,8 @@ expressApp.post('/message', function(req, res) {
 
     const deconcentratorMessage = {}
     deconcentratorMessage.text = text
-    // deconcentratorMessage.min_confidence_score = 0.75
-    deconcentratorMessage.min_confidence_score = 0.64
+
+    deconcentratorMessage.min_confidence_score = 0.50
     deconcentratorMessage.processors = ["rasa"]
     deconcentratorMessage.history = ["gateway"]
 
