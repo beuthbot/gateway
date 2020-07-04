@@ -3,6 +3,7 @@ services:
   gateway:
     build: .
     restart: unless-stopped
+    container_name: gateway
     ports:
       - 3000:3000
     environment:

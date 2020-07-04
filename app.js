@@ -24,6 +24,24 @@ expressApp.use(bodyParser.json())
 // for parsing application/x-www-form-urlencoded
 expressApp.use(bodyParser.urlencoded({ extended: true }))
 
+const dontKnow = [
+    "Das kann ich nicht.",
+    "Das weiß ich nicht.",
+    "Kein Plan.",
+    "Kein Ahnung.",
+    "Hier bin ich überfragt.",
+    "Da bin ich überfragt.",
+    "Seh ich so aus, als ob ich das wüßte.",
+    "Wer soll denn sowas wissen.",
+    "Wer weiß den sowas.",
+    "..."
+]
+
+function randomDontKnowAnswer() {
+    let randomNumber = Math.floor(Math.random() * dontKnow.length)
+    return dontKnow[randomNumber]
+}
+
 expressApp.get('/', function(req, res) {
     res.send('Hello from BeuthBot Gateway')
     res.end()
@@ -43,7 +61,7 @@ expressApp.post('/message', function(req, res) {
     if (!text || text.length < 1) {
         message.error = "message has no text property"
         message.answer = {
-            "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten.",
+            "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
             "history": ["gateway"]
         }
         res.json(message)
@@ -53,25 +71,67 @@ expressApp.post('/message', function(req, res) {
 
     const deconcentratorMessage = {}
     deconcentratorMessage.text = text
-    deconcentratorMessage.min_confidence_score = 0.75
+    // deconcentratorMessage.min_confidence_score = 0.75
+    deconcentratorMessage.min_confidence_score = 0.64
     deconcentratorMessage.processors = ["rasa"]
     deconcentratorMessage.history = ["gateway"]
 
-    deconcentrator
-        .interpretate(deconcentratorMessage)
+    database.getUser(message)
+        .then(function (user) {
+            // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
+            deconcentratorMessage.user = user
+            return deconcentrator.interpretate(deconcentratorMessage)
+        })
         .then(function (deconcentratorResponse) {
 
-            return registry.postMessage(deconcentratorResponse.data)
+            if (!deconcentratorResponse || !deconcentratorResponse.data) {
+                let errorMessage = message
+                errorMessage.answer = {
+                    "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar.",
+                    "history": ["gateway"]
+                }
+                res.json(errorMessage)
+                res.end()
+                return
+            }
+
+            const intent = deconcentratorResponse.data.intent
+
+            // the bot didn't understand the message
+            if (!intent || !intent.name) {
+                let errorMessage = message
+                errorMessage.answer = {
+                    "content": randomDontKnowAnswer(),
+                    "history": ["gateway"]
+                }
+                res.json(errorMessage)
+                res.end()
+
+                return
+            }
+
+            const registryMessage = deconcentratorResponse.data
+            registryMessage.text = deconcentratorMessage.text
+            registryMessage.user = deconcentratorMessage.user
+
+            return registry.postMessage(registryMessage)
 
         })
         .then(function (registryResponse) {
 
-            if (!registryResponse || !registryResponse.data) {
-                message.answer = {
-                    "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten.",
+            if (!registryResponse) {
+                console.log("no registryResponse")
+                return
+            }
+
+            if (!registryResponse.data) {
+                console.log("no registryResponse.data")
+                let errorMessage = message
+                errorMessage.answer = {
+                    "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar.",
                     "history": ["gateway"]
                 }
-                res.json(message)
+                res.json(errorMessage)
                 res.end()
                 return
             }
@@ -90,12 +150,13 @@ expressApp.post('/message', function(req, res) {
         })
         .catch(function (error) {
             console.log(error)
-            message.error = String(error)
-            message.answer = {
+            let errorMessage = message
+            errorMessage.error = String(error)
+            errorMessage.answer = {
                 "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten.",
                 "history": ["gateway"]
             }
-            res.json(message)
+            res.json(errorMessage)
             res.end();
         })
 })

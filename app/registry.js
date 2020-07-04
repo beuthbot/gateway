@@ -11,7 +11,7 @@ const util = require('util')
 
 async function postMessage(requestBody) {
 
-    console.debug("post message:\n" + util.inspect(requestBody, false, null, true) + "\n\n")
+    console.debug("post message in registry:\n" + util.inspect(requestBody, false, null, true) + "\n\n")
     const response = await axios.post(endpoint, requestBody)
 
     if (response.data) {

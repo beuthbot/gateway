@@ -12,20 +12,16 @@ const util = require('util')
 async function getUser(message) {
 
     console.debug("getUser message:\n" + util.inspect(message, false, null, true) + "\n\n")
-    const userCandidateResponse = await axios.get(endpoint, message)
+    const userCandidateResponse = await axios.post(endpoint, message)
 
-    if (userCandidateResponse) {
-        console.debug("userCandidateResponse:\n" + util.inspect(userCandidateResponse, false, null, true) + "\n\n")
-    }
-
-    if (userCandidateResponse.data) {
+    if (userCandidateResponse && userCandidateResponse.data) {
         console.debug("databases response:\n" + util.inspect(userCandidateResponse.data, false, null, true) + "\n\n")
+        return userCandidateResponse.data
     } else {
-        console.debug("no response.data")
+        console.debug("no userCandidateResponse found")
     }
 
-    return userCandidateResponse
-
+    return null
 }
 
 exports.getUser = getUser
