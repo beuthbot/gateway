@@ -140,7 +140,7 @@ expressApp.post('/message', function(req, res) {
 
             console.debug("registryAnswer:\n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
 
-            if (registryAnswer.answer.history) {
+            if (registryAnswer.answer && registryAnswer.answer.history) {
                 registryAnswer.answer.history.push('gateway')
             }
 
