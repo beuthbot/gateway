@@ -1,35 +1,68 @@
 @startuml
 actor User
 
-box "BeuthBot" #LightBlue
 participant "gateway" as GW
-participant "deconcentrator.js" as DC
-participant "database" as DB
-participant "registry" as RE
 
+box "Database"
+participant "database" as DB
+participant "mongo" as MONGO
 end box
+
+participant "deconcentrator.js" as DC
+participant "rasa" as RASA
+participant "registry" as RE
+participant "service" as SE
 
 User -> GW: message
 activate GW
 
-GW -> DC: request \ninterpretation
-activate DC
-DC -> DC: NLU \nprocessing
-DC -> GW: intent
-deactivate DC
-
 GW -> DB: request user
 activate DB
-DB -> DB: lookup user
+DB -> MONGO: lookup user
+activate MONGO
+MONGO -> DB: user?
+deactivate MONGO
+
+alt user exists case
+DB -> GW: user
+else user does not exist
+DB -> MONGO: create user
+activate MONGO
+MONGO -> DB: user
+deactivate MONGO
 DB -> GW: user
 deactivate DB
+end
+
+GW -> DC: request \ninterpretation
+activate DC
+DC -> RASA: request
+
+activate RASA
+RASA -> RASA: NLU \nprocessing
+RASA -> DC: intent
+deactivate RASA
+DC -> DC: filter intents
+DC -> GW: intent?
+deactivate DC
+
+alt no intent found
+
+GW -> User: answer \ndid not understand...
+
+else intent found
 
 GW -> RE: intent + user
 activate RE
-RE -> RE: send to \nmicroservice
+RE -> SE: intent + user
+activate SE
+SE -> SE: process
+SE -> RE: answere
+deactivate SE
 RE -> GW: answere
 deactivate RE
-
 GW -> User: answere
 deactivate GW
+
+end
 @enduml
