@@ -27,13 +27,9 @@ expressApp.use(bodyParser.urlencoded({ extended: true }))
 const dontKnow = [
     "Das kann ich nicht.",
     "Das weiß ich nicht.",
-    "Kein Plan.",
     "Kein Ahnung.",
     "Hier bin ich überfragt.",
     "Da bin ich überfragt.",
-    "Seh ich so aus, als ob ich das wüßte.",
-    "Wer soll denn sowas wissen.",
-    "Wer weiß den sowas.",
     "..."
 ]
 
