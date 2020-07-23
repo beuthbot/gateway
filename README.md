@@ -78,7 +78,7 @@ Whereas everything except of the `text` property is optional. So at a bare minim
 | -------------- | ------------------- | ------------------------------------------------------------ |
 | text           | `String`            | The actual text for the bot.                                 |
 | answer.content | `String` (optional) | The answer of the bot.                                       |
-| answer.history | `String` (optional) | A trace of the services the message passed till the <br>answer. |
+| answer.history | `Array<String>` (optional) | A trace of the services the message passed till the <br>answer. |
 
 
 
