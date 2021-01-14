@@ -33,6 +33,9 @@ POST http://<YOUR_GATEWAY_URL>:3000/message
 
 ### Request Body
 
+The request body differs for every messenger type.
+
+#### Telegram
 ```json
 {
    "text": "Wie wird das Wetter morgen?",
@@ -40,7 +43,6 @@ POST http://<YOUR_GATEWAY_URL>:3000/message
    ...
 }
 ```
-
 | Property     | Type                 | About                                     |
 | ------------ | -------------------- | ----------------------------------------- |
 | text         | `String`             | The actual text for the bot.              |
@@ -50,6 +52,64 @@ POST http://<YOUR_GATEWAY_URL>:3000/message
 | lastName     | `String` (optional)  | A possible last name of the user.         |
 | clientDate   | `Timestamp` (option) | The current date of the client app / bot. |
 | clientSecret | `String` (optional)  | The client's api key.                     |
+
+#### Discord
+```json
+{
+   "text": "Wie wird das Wetter morgen?",
+   "serviceUserId": 12345,
+   ...
+}
+```
+| Property      | Type                 | About                                     |
+| ------------  | -------------------- | ----------------------------------------- |
+| text          | `String`             | The actual text for the bot.              |
+| serviceUserId | `Integer` (optional) | The discord id of the user.              |
+| nickname      | `String` (optional)  | A possible nickname of the user.          |
+| clientDate    | `Timestamp` (option) | The current date of the client app / bot. |
+| clientLanguage| `String` (optional)  | The client's language.                     |
+
+#### Website
+```json
+{
+   "text": "Wie wird das Wetter morgen?",
+   "id": 12345,
+   ...
+}
+```
+| Property      | Type                 | About                                     |
+| ------------  | -------------------- | ----------------------------------------- |
+| text          | `String`             | The actual text for the bot.              |
+| id            | `Integer` (optional) | The website id of the user.               |
+| nickname      | `String` (optional)  | A possible nickname of the user.          |
+| clientDate    | `Timestamp` (option) | The current date of the client app / bot. |
+
+#### Request to the database-service
+
+Before sending the request to the database-service, the gateway will filter the message to transform the id-information from the message into the folling format:
+
+| Property     | Type                 | About                                     |
+| ------------ | -------------------- | ----------------------------------------- |
+| id           | `Integer` (optional) | The id of the user.                       |
+| messenger    | `String` (optional)  | the messenger of the user.                |
+
+The specific information from the different messengers, like firstName and lastName from telegram, are not removed in this process.
+As a result, the sended template of a telegram message looks like this:
+
+| Property     | Type                 | About                                     |
+| ------------ | -------------------- | ----------------------------------------- |
+| text         | `String`             | The actual text for the bot.              |
+| id           | `Integer` (optional) | The id of the user.                       |
+| messenger    | `String` (optional)  | the messenger of the user.                |
+| telegramId   | `Integer` (optional) | The telegram id of the user.              |
+| nickname     | `String` (optional)  | A possible nickname of the user.          |
+| firstName    | `String` (optional)  | A possible first name of the user.        |
+| lastName     | `String` (optional)  | A possible last name of the user.         |
+| clientDate   | `Timestamp` (option) | The current date of the client app / bot. |
+| clientSecret | `String` (optional)  | The client's api key.                     |
+
+
+
 
 
 Whereas everything except of the `text` property is optional. So at a bare minimum a body of a request could looks like the following.
