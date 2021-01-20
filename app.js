@@ -24,6 +24,10 @@ expressApp.use(bodyParser.json())
 // for parsing application/x-www-form-urlencoded
 expressApp.use(bodyParser.urlencoded({ extended: true }))
 
+// Enable All CORS Requests
+var cors = require('cors')
+expressApp.use(cors())
+
 const dontKnow = [
     "Das kann ich nicht.",
     "Das weiß ich nicht.",
