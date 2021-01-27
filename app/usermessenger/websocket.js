@@ -2,11 +2,12 @@ const WebSocket = require('ws');
 const PayloadType = require('./payloads/PayloadType');
 
 class MyWebSocket{
-    wss = null;
 
-    clients = {};
-
-    keepAliveInterval = 10000;
+    constructor() {
+        this.wss = null;
+        this.clients = {};
+        this.keepAliveInterval = 10000;
+    }
 
     getChatServiceClient(serviceName){
         return this.clients[serviceName];
