@@ -16,9 +16,10 @@ class MyWebSocket{
     send(serviceName, clientServiceId, message){
         const websocket = this.getChatServiceClient(serviceName);
         if(!websocket){
-            throw new Error('Service Name not registered currently');
+            throw new Error('Service Name "'+serviceName+'" currently not registered');
         }
-        websocket.send(JSON.stringify({
+
+        return websocket.send(JSON.stringify({
             type: 'message',
             userId: clientServiceId,
             message: message
@@ -40,6 +41,8 @@ class MyWebSocket{
 
     connect(service){
         this.wss = new WebSocket.Server({ server: service.server });
+
+        console.log('Created Websocket Server')
 
         this.wss.on('connection', (ws) => {
 
