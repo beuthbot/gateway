@@ -9,6 +9,9 @@
  * Version: 2.1 (01/23/2020)
  */
 
+const dotenv = require('dotenv')
+dotenv.config()
+
 // load node.js modules
 const {Service, AppConfig} = require("@bhtbot/bhtbotservice")
 const Messenger = require('./app/usermessenger/messenger');
@@ -70,6 +73,27 @@ app.start().then(service => {
         res.end()
     })
 
+    service.expressApp.post('/send', (req, res)=>{
+
+        console.log(req)
+        if(req.body.token !== process.env.USERMESSENGER_TOKEN)
+            return res.send('token invalid');
+
+        const valid = ['service', 'user', 'message'].reduce((prev, curr) => {
+            if(!req.body[curr]) res.send('missing param: ' + curr);
+            return prev && !!req.body[curr]
+        } , true)
+        if(!valid){
+            return;
+        }
+
+        const result = messengerService.send({
+            clients: [
+                {serviceName: req.body.service, clientId: req.body.user}
+            ]
+        }, req.body.message)
+        return res.send(result)
+    })
 
     //todo audio route is pseudo code
     service.fileUploadEndpoint('/audio', function(req, res) {

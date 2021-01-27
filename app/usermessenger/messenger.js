@@ -12,10 +12,23 @@ class UserMessenger{
     }
 
     send(user, message){
+        const result = [];
         this.userForeach(user, (serviceName, clientId)=>{
+            const resultData = {
+                success: false,
+                serviceName: serviceName,
+                clientId: clientId
+            };
             console.log('send to', serviceName, clientId)
-            chatbotsSocket.send(serviceName, clientId, message);
+            try{
+                chatbotsSocket.send(serviceName, clientId, message);
+                result.push(Object.assign(resultData, {success: true}));
+            }
+            catch (e){
+                result.push(Object.assign(resultData, {error: e.message}));
+            }
         })
+        return result;
     }
 
     sendFile(user, localFilePath){
