@@ -88,7 +88,7 @@ Whereas everything except of the `text` property is optional. So at a bare minim
 
 ```shell
 curl http://localhost:3000/message \
-		-X POST \
+    -X POST \
     -H "Content-Type: application/json" \
     --data "{\"text\":\"Wie wird das Wetter morgen?\"}"
 ```
