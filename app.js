@@ -11,6 +11,8 @@
 
 // load node.js modules
 const {Service, AppConfig} = require("@bhtbot/bhtbotservice")
+const Messenger = require('./app/usermessenger/messenger');
+let messengerService = null;
 
 const util = require('util')
 const cors = require('cors')
@@ -41,6 +43,28 @@ function randomDontKnowAnswer() {
 
 app.start().then(service => {
 
+    messengerService = new Messenger(service);
+
+    /*
+
+    console.log('sending test message in 5 seconds')
+    setTimeout(()=>{
+        console.log('send message to client')
+
+        const dennis = {
+            clients: [
+                {serviceName: 'discord', clientId: '185540011314249729'}
+            ]
+        };
+
+        // messengerService.send(dennis, 'Test User Messenger')
+
+        messengerService.sendFile(dennis, __dirname + '/app.js')
+
+    }, 5000)
+
+   */
+
     service.expressApp.get('/', function(req, res) {
         res.send('Hello from BeuthBot Gateway')
         res.end()
@@ -48,19 +72,26 @@ app.start().then(service => {
 
 
     //todo audio route is pseudo code
-    service.expressApp.post('/audio', function(req, res) {
+    service.fileUploadEndpoint('/audio', function(req, res) {
 
-        //todo send answer first
+        //todo execute async
+        (()=>{
 
-        const binaryAudio = 'todo: get binary ';
+            const binaryAudio = ''; //todo: get binary
 
-        const text = 'todo send to stt';
+            const text = ''; //todo send to stt
 
-        const answer = 'todo use common path';
+            const answer = ''; //todo use common path
 
-        const binaryResponseAudio = 'todo send to tts';
+            const binaryResponseAudio = ''; //todo send to tts
 
-        //todo give to usermessenger service
+            const user = ''; //todo get user client / service mappings
+
+            messengerService.sendFile(user, __dirname + '/audioanswer.ogg') //todo send file answer
+
+        }).call()
+
+        return res.setContent('Deine Sprachnachricht wird verarbeitet...');
     })
 
 // the route the API will call:
