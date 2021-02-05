@@ -5,18 +5,26 @@
  *  - Robert Halwaß
  */
 
+var FormData = require('form-data');
+const Duplex = require('stream').Duplex;
 const axios = require('axios')
 const endpoint = process.env.STT_ENDPOINT || "http://localhost:7002/stt"
 
+function bufferToStream(buffer) {
+    let stream = new Duplex();
+    stream.push(buffer);
+    stream.push(null);
+    return stream;
+}
 
 async function getText(file) {
     try {
-        var data = new FormData();
-        data.append('audio', file);
+       var data = new FormData();
+        data.append('audio', bufferToStream(file));
 
         var config = {
         method: 'post',
-        url: 'localhost:3000/stt',
+        url: endpoint,
         headers: { 
             ...data.getHeaders()
         },
@@ -26,6 +34,7 @@ async function getText(file) {
     }
     catch (e) {
         /* ignored exception, probably 404 */
+        console.log(e)
     }
     console.debug("STT Error")
     return null
