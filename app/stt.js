@@ -13,13 +13,14 @@ async function getText(file) {
     try {
         var data = new FormData();
         data.append('audio', file);
+
         var config = {
-            method: 'post',
-            url: endpoint,
-            headers: { 
-              ...data.getHeaders()
-            },
-            data : data
+        method: 'post',
+        url: 'localhost:3000/stt',
+        headers: { 
+            ...data.getHeaders()
+        },
+        data : data
         };
         return await axios(config)
     }
