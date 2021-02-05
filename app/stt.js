@@ -16,7 +16,7 @@ async function getText(file) {
 
         var config = {
         method: 'post',
-        url: 'localhost:3000/stt',
+        url: endopoint,
         headers: { 
             ...data.getHeaders()
         },
