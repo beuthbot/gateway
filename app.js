@@ -23,6 +23,7 @@ const cors = require('cors')
 const deconcentrator = require('./app/deconcentrator')
 const registry = require('./app/registry')
 const database = require('./app/database')
+const stt = require('./app/stt')
 
 const config = new AppConfig();
 config.port = 3000;
@@ -100,18 +101,20 @@ app.start().then(service => {
 
         //todo execute async
         (()=>{
+            
+            const binaryAudio = req.files.file.data; //todo: get binary
 
-            const binaryAudio = ''; //todo: get binary
+            const text = stt.getText(binaryAudio)
 
-            const text = ''; //todo send to stt
+            console.log(text)
 
-            const answer = ''; //todo use common path
+            // const answer = ''; //todo use common path
 
-            const binaryResponseAudio = ''; //todo send to tts
+            // const binaryResponseAudio = ''; //todo send to tts
 
-            const user = ''; //todo get user client / service mappings
+            // const user = ''; //todo get user client / service mappings
 
-            messengerService.sendFile(user, __dirname + '/audioanswer.ogg') //todo send file answer
+            // messengerService.sendFile(user, __dirname + '/audioanswer.ogg') //todo send file answer
 
         }).call()
 
