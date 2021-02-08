@@ -106,7 +106,7 @@ app.start().then(service => {
             
             const binaryAudio = req.files.file.data; //todo: get binary
 
-            const text = stt.getText(binaryAudio)
+            const text = await stt.getText(binaryAudio)
 
             console.log(text)
 
