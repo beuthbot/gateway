@@ -1,4 +1,4 @@
-/**
+                                          /**
  * database.js
  *
  * Contributed by:
@@ -7,8 +7,9 @@
 
 var FormData = require('form-data');
 const Duplex = require('stream').Duplex;
+const fs = require('fs');
 const axios = require('axios')
-const endpoint = process.env.STT_ENDPOINT || "http://localhost:7002/stt"
+const endpoint = process.env.STT_ENDPOINT || "http://stt:7002/stt"
 
 function bufferToStream(buffer) {
     let stream = new Duplex();
@@ -19,7 +20,8 @@ function bufferToStream(buffer) {
 
 async function getText(file) {
     try {
-       var data = new FormData();
+        //fs.writeFileSync('tmp.ogg', file);
+        var data = new FormData();
         data.append('audio', bufferToStream(file));
 
         var config = {
@@ -28,9 +30,15 @@ async function getText(file) {
         headers: { 
             ...data.getHeaders()
         },
-        data : data
+            data : data
         };
-        return await axios(config)
+        axios(config)
+        .then(function (response) {
+            return JSON.stringify(response.data);
+        })
+        .catch(function (error) {
+                console.log(error);
+        });
     }
     catch (e) {
         /* ignored exception, probably 404 */
