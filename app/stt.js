@@ -20,8 +20,8 @@ function bufferToStream(buffer) {
 
 async function getText(file) {
     try {
-        //fs.writeFileSync('tmp.ogg', file);
         var data = new FormData();
+
         data.append('audio', bufferToStream(file));
 
         var config = {
@@ -37,7 +37,7 @@ async function getText(file) {
             return JSON.stringify(response.data);
         })
         .catch(function (error) {
-                console.log(error);
+            console.log(error);
         });
     }
     catch (e) {
