@@ -103,41 +103,33 @@ app.start().then(service => {
 
         //todo execute async
         (()=>{
-            
-            const binaryAudio = req.files.file.data; //todo: get binary
+                const binaryAudio = req.files.file.data; //todo: get binary
 
-            const text = await stt.getText(binaryAudio)
+                stt.getText(binaryAudio)
+                     .then(function (text) {
 
-            console.log(text)
 
-            // const answer = ''; //todo use common path
+                    // guard the existence of a valid text content
+                if (!text || text.length < 1) {
+                    message.error = "message has no text property"
+                    message.answer = {
+                        "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
+                        "history": ["gateway"]
+                    }
+                    res.json(message)
+                    res.end();
+                    return
+                }
 
-            // const user = ''; //todo get user client / service mappings
-//-
-            let message
-            // set message.text to text from stt
-            message.text = text
+                const deconcentratorMessage = {}
+                deconcentratorMessage.text = text
 
-            // guard the existence of a valid text content
-        if (!text || text.length < 1) {
-            message.error = "message has no text property"
-            message.answer = {
-                "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
-                "history": ["gateway"]
-            }
-            res.json(message)
-            res.end();
-            return
-        }
+                // deconcentratorMessage.min_confidence_score = 0.50
+                deconcentratorMessage.processors = ["rasa"]
+                deconcentratorMessage.history = ["gateway"]
 
-        const deconcentratorMessage = {}
-        deconcentratorMessage.text = text
-
-        // deconcentratorMessage.min_confidence_score = 0.50
-        deconcentratorMessage.processors = ["rasa"]
-        deconcentratorMessage.history = ["gateway"]
-
-        database.getUser(message)
+                database.getUser(message)
+            )}
             .then(function (user) {
                 // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
                 deconcentratorMessage.user = user
