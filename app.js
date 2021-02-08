@@ -129,7 +129,7 @@ app.start().then(service => {
                 deconcentratorMessage.history = ["gateway"]
 
                 database.getUser(message)
-            )}
+            })
             .then(function (user) {
                 // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
                 deconcentratorMessage.user = user
