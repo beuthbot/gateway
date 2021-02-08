@@ -114,6 +114,7 @@ app.start().then(service => {
 
             // const user = ''; //todo get user client / service mappings
 //-
+            let message
             // set message.text to text from stt
             message.text = text
 
