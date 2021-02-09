@@ -222,7 +222,7 @@ app.start().then(service => {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
                     const convertResult = spawnSync('avconv', ['-i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -map 0:a -codec:a opus -b:a 100k -vbr on ' + __dirname + '/tmp/' + timeStamp + 'converted.ogg'])
                     console.log(convertResult)
-                    //fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stdout)
+                    fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stdout)
                     fs.readdirSync(__dirname+'/tmp/').forEach(file => {
                         console.log(file);
                     });
