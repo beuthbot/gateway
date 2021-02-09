@@ -1,6 +1,6 @@
-apt-get update
-apt-get install ffmpeg -y
-apt-get install libogg0 -y
-apt-get install libopus0 -y
-apt-get install opus-tools -y
-apt-get install sox -y
+apk update
+apk add ffmpeg -y
+apk add libogg0 -y
+apk add libopus0 -y
+apk add opus-tools -y
+apk add sox -y

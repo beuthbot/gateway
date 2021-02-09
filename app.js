@@ -221,7 +221,7 @@ app.start().then(service => {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
                     spawnSync('ffmpeg -i ' + __dirname+'/app/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname+'/app/tmp/' + timeStamp + 'converted.ogg') 
                     
-                    messengerService.sendFile(user, __dirname + '/app/tmp/' + timeStamp + '.ogg')
+                    messengerService.sendFile(user, __dirname + '/app/tmp/' + timeStamp + 'converted.ogg')
                     console.log("did send message")
                     // request is finished
                 });
