@@ -3,7 +3,7 @@
 * Contributed by:
 *  - Robert Halwaß
 */
-
+const fs = require('fs');
 const request = require('request')
 const endpoint = process.env.TTS_ENDPOINT || "http://tts:7003/tts"
 
