@@ -23,7 +23,7 @@ async function sendAudio(user, text, messengerService){
     })
     .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
         messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
-        fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
+        //fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
     });
 }
 
