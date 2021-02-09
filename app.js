@@ -196,7 +196,6 @@ app.start().then(service => {
 
                 const registryAnswer = registryResponse.data
 
-                console.log()
                 messengerService.send(user, registryAnswer.answer.content)
 
                 console.debug("registryAnswer:\n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
