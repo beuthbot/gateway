@@ -203,9 +203,9 @@ app.start().then(service => {
                 if (registryAnswer.answer && registryAnswer.answer.history) {
                     registryAnswer.answer.history.push('gateway')
                 }
-
+                const timeStamp = Date.now()
                 request.post({
-                        uri: process.env.STT_ENDPOINT || "http://tts:7003/tts",
+                        uri: process.env.TTS_ENDPOINT || "http://tts:7003/tts",
                         method: 'POST',
                         body: {message: {registryAnswer}},
                         json: true
@@ -217,10 +217,11 @@ app.start().then(service => {
                     .on('finish', function (err) {
                         // request is finished
                     })
-                    .pipe(fs.createWriteStream(__dirname+'/app/audioanswer.ogg')) .on('finish', function (err) {
+                    .pipe(fs.createWriteStream(__dirname+'/app/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
+                    spawnSync('ffmpeg -i ' + __dirname+'/app/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname+'/app/tmp/' + timeStamp + 'converted.ogg') 
                     
-                    messengerService.sendFile(user, __dirname + '/app/audioanswer.ogg')
+                    messengerService.sendFile(user, __dirname + '/app/tmp/' + timeStamp + '.ogg')
                     console.log("did send message")
                     // request is finished
                 });
