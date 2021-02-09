@@ -21,8 +21,8 @@ async function sendAudio(user, text, messengerService){
     .on('finish', function (err) {
         // request is finished
     })
-    .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
-        messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
+    .pipe(fs.createWriteStream('/usr/src/app/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
+        messengerService.sendFile(user, '/usr/src/app/tmp/tmp/' + timeStamp + '.ogg')
         //fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
     });
 }
