@@ -230,7 +230,7 @@ app.start().then(service => {
                     console.log(playResult)
                     const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
                     console.log("Converted Exist", exist)
-                    messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + 'converted.ogg')
+                    messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
                     fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
                     fs.unlinkSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
                 });
