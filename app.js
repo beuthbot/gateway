@@ -99,7 +99,7 @@ app.start().then(service => {
                     if (!text || text.length < 1) {
                         const errorMessage = "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text."
                         messengerService.send(user, errorMessage)
-                        tts.sendAudio(user, errorMessage, messengerService)
+                        tts(user, errorMessage, messengerService)
                         return
                     }
                     deconcentratorMessage.text = text
@@ -120,7 +120,7 @@ app.start().then(service => {
                 if (!deconcentratorResponse || !deconcentratorResponse.data) {
                     const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar."
                     messengerService.send(user, errorMessage)
-                    tts.sendAudio(user, errorMessage, messengerService)
+                    tts(user, errorMessage, messengerService)
                     return
                 }
 
@@ -129,7 +129,7 @@ app.start().then(service => {
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
                     messengerService.send(user, randomDontKnowAnswer())
-                    tts.sendAudio(user, errorMessage, messengerService)
+                    tts(user, errorMessage, messengerService)
                     return
                 }
 
@@ -151,7 +151,7 @@ app.start().then(service => {
                     console.log("no registryResponse.data")
                     const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar."
                     messengerService.send(user, errorMessage)
-                    tts.sendAudio(user, errorMessage, messengerService)
+                    tts(user, errorMessage, messengerService)
                     return
                 }
 
@@ -164,7 +164,7 @@ app.start().then(service => {
                 if (registryAnswer.answer && registryAnswer.answer.history) {
                     registryAnswer.answer.history.push('gateway')
                 }
-                tts.sendAudio(user, registryAnswer, messengerService)
+                tts(user, registryAnswer, messengerService)
 
             })
             .catch(function (error) {
