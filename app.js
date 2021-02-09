@@ -114,6 +114,7 @@ app.start().then(service => {
                 .then(function (stt_response) {
                     text = stt_response.answer.content
                     console.log(text)
+                    messengerService.send(user, 'Ich habe verstand: "' + text + '"')
                     // guard the existence of a valid text content
                     if (!text || text.length < 1) {
                         // message.error = "message has no text property"
@@ -216,7 +217,9 @@ app.start().then(service => {
                     })
                     .pipe(fs.createWriteStream(__dirname+'/app/audioanswer.ogg')) .on('finish', function (err) {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
+                    
                     messengerService.sendFile(user, __dirname + '/app/audioanswer.ogg')
+                    console.log("did send message")
                     // request is finished
                 });
 
