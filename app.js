@@ -227,6 +227,7 @@ app.start().then(service => {
                         console.log(file);
                     });
                     const playResult = spawnSync('ffplay', [__dirname+'/tmp/' + timeStamp + 'converted.ogg'])
+                    console.log(playResult)
                     const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
                     console.log("Converted Exist", exist)
                     messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + 'converted.ogg')
