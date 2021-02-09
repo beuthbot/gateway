@@ -220,10 +220,9 @@ app.start().then(service => {
                     })
                     .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
-                    const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + '.ogg')
-                    console.log("Exist", exist)
                     const convertResult = spawnSync('ffmpeg', ['-i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname+'/tmp/' + timeStamp + 'converted.ogg']) 
-                    console.log(convertResult)
+                    const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
+                    console.log("Converted Exist", exist)
                     messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + 'converted.ogg')
                     console.log("did send message")
                     // request is finished
