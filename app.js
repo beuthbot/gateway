@@ -222,6 +222,9 @@ app.start().then(service => {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
                     const convertResult = spawnSync('ffmpeg', ['-i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname+'/tmp/' + timeStamp + 'converted.ogg'])
                     console.log(convertResult) 
+                    fs.readdirSync(__dirname+'/tmp/').forEach(file => {
+                        console.log(file);
+                    });
                     const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
                     console.log("Converted Exist", exist)
                     messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + 'converted.ogg')
