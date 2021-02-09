@@ -2,6 +2,7 @@
 FROM node:11-alpine
 
 RUN mkdir -p /usr/src/app
+RUN mkdir -p /usr/src/tmp
 
 WORKDIR /usr/src/app
 
