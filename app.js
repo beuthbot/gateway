@@ -39,8 +39,7 @@ const dontKnow = [
     "Das weiß ich nicht.",
     "Kein Ahnung.",
     "Hier bin ich überfragt.",
-    "Da bin ich überfragt.",
-    "..."
+    "Da bin ich überfragt."
 ]
 
 function randomDontKnowAnswer() {
@@ -51,26 +50,6 @@ function randomDontKnowAnswer() {
 app.start().then(service => {
 
     messengerService = new Messenger(service);
-
-    /*
-
-    console.log('sending test message in 5 seconds')
-    setTimeout(()=>{
-        console.log('send message to client')
-
-        const dennis = {
-            clients: [
-                {serviceName: 'discord', clientId: '185540011314249729'}
-            ]
-        };
-
-        // messengerService.send(dennis, 'Test User Messenger')
-
-        messengerService.sendFile(dennis, __dirname + '/app.js')
-
-    }, 5000)
-
-   */
 
     service.expressApp.get('/', function(req, res) {
         res.send('Hello from BeuthBot Gateway')
@@ -118,14 +97,8 @@ app.start().then(service => {
                     messengerService.send(user, 'Ich habe verstanden: "' + text + '"')
                     // guard the existence of a valid text content
                     if (!text || text.length < 1) {
-                        // message.error = "message has no text property"
-                        // message.answer = {
-                        //     "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
-                        //     "history": ["gateway"]
-                        // }
-                        console.log('message doesnt exist')
-                        // res.json(message)
-                        // res.end();
+                        const errorMessage = "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text."
+                        messengerService.send(user, errorMessage)
                         return
                     }
                     deconcentratorMessage.text = text
@@ -144,13 +117,8 @@ app.start().then(service => {
             .then(function (deconcentratorResponse) {
 
                 if (!deconcentratorResponse || !deconcentratorResponse.data) {
-                    // let errorMessage = message
-                    // errorMessage.answer = {
-                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar.",
-                    //     "history": ["gateway"]
-                    // }
-                    // res.json(errorMessage)
-                    // res.end()
+                    const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar."
+                    messengerService.send(user, errorMessage)
                     return
                 }
 
@@ -158,14 +126,7 @@ app.start().then(service => {
 
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
-                    // let errorMessage = message
-                    // errorMessage.answer = {
-                    //     "content": randomDontKnowAnswer(),
-                    //     "history": ["gateway"]
-                    // }
-                    // res.json(errorMessage)
-                    // res.end()
-
+                    messengerService.send(user, randomDontKnowAnswer())
                     return
                 }
 
@@ -185,13 +146,8 @@ app.start().then(service => {
 
                 if (!registryResponse.data) {
                     console.log("no registryResponse.data")
-                    // let errorMessage = message
-                    // errorMessage.answer = {
-                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar.",
-                    //     "history": ["gateway"]
-                    // }
-                    // res.json(errorMessage)
-                    // res.end()
+                    const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar."
+                    messengerService.send(user, errorMessage)
                     return
                 }
 
