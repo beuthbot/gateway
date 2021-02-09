@@ -19,10 +19,7 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "nodemon": "^2.0.7",
-<<<<<<< HEAD
-=======
     "request": "^2.88.2",
->>>>>>> de000ce8ccb4bee4ea68525a569b5f1dbfb2c4a3
     "ws": "^7.4.2",
     "form-data": "^3.0.0"
   }

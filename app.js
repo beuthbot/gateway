@@ -114,8 +114,9 @@ app.start().then(service => {
                             "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
                             "history": ["gateway"]
                         }
-                        res.json(message)
-                        res.end();
+                        console.log(message)
+                        // res.json(message)
+                        // res.end();
                         return
                     }
 
@@ -126,7 +127,7 @@ app.start().then(service => {
                     deconcentratorMessage.processors = ["rasa"]
                     deconcentratorMessage.history = ["gateway"]
 
-                    database.getUser(message)
+                    return database.getUser(req.getUserId)
             })
             .then(function (user) {
                 // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
