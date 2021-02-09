@@ -2,7 +2,7 @@
 FROM node:12
 
 RUN mkdir -p /usr/src/app
-RUN mkdir -p /usr/src/tmp
+RUN mkdir -p /usr/src/app/tmp
 
 WORKDIR /usr/src/app
 
