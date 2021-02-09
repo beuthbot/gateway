@@ -7,7 +7,7 @@ apt-get install sox -y
 
 ffmpeg -i test.ogg -f wav - | opusenc - output.ogg
 
-FILE=output.ogg
+FILE=outut.ogg
 if test -f "$FILE"; then
     echo "$FILE exists."
 fi
