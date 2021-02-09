@@ -1,5 +1,5 @@
                                           /**
- * database.js
+ * stt.js
  *
  * Contributed by:
  *  - Robert Halwaß

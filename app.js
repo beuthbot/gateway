@@ -19,14 +19,13 @@ let messengerService = null;
 
 const util = require('util')
 const cors = require('cors')
-const request = require('request')
-const fs = require('fs');
-const { spawnSync } = require('child_process');
 
 const deconcentrator = require('./app/deconcentrator')
 const registry = require('./app/registry')
 const database = require('./app/database')
-const stt = require('./app/stt')
+const stt = require('./app/stt');
+const tts = require('./app/tts');
+const { response } = require('express');
 
 const config = new AppConfig();
 config.port = 3000;
@@ -88,6 +87,7 @@ app.start().then(service => {
                     {serviceName: serviceName, clientId: serviceUserId}
                 ]
             };
+            var antwort = ""
             const binaryAudio = req.files.file.data; //todo: get binary
             const deconcentratorMessage = {}
             stt.getText(binaryAudio)
@@ -99,6 +99,7 @@ app.start().then(service => {
                     if (!text || text.length < 1) {
                         const errorMessage = "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text."
                         messengerService.send(user, errorMessage)
+                        tts.sendAudio(user, errorMessage, messengerService)
                         return
                     }
                     deconcentratorMessage.text = text
@@ -119,6 +120,7 @@ app.start().then(service => {
                 if (!deconcentratorResponse || !deconcentratorResponse.data) {
                     const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar."
                     messengerService.send(user, errorMessage)
+                    tts.sendAudio(user, errorMessage, messengerService)
                     return
                 }
 
@@ -127,6 +129,7 @@ app.start().then(service => {
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
                     messengerService.send(user, randomDontKnowAnswer())
+                    tts.sendAudio(user, errorMessage, messengerService)
                     return
                 }
 
@@ -148,6 +151,7 @@ app.start().then(service => {
                     console.log("no registryResponse.data")
                     const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar."
                     messengerService.send(user, errorMessage)
+                    tts.sendAudio(user, errorMessage, messengerService)
                     return
                 }
 
@@ -160,24 +164,7 @@ app.start().then(service => {
                 if (registryAnswer.answer && registryAnswer.answer.history) {
                     registryAnswer.answer.history.push('gateway')
                 }
-                const timeStamp = Date.now()
-                request.post({
-                        uri: process.env.TTS_ENDPOINT || "http://tts:7003/tts",
-                        method: 'POST',
-                        body: {message: {registryAnswer}},
-                        json: true
-                    }
-                )
-                    .on('error', function (err) {
-                        // error handling
-                    })
-                    .on('finish', function (err) {
-                        // request is finished
-                    })
-                    .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
-                    messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
-                    fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
-                });
+                tts.sendAudio(user, registryAnswer, messengerService)
 
             })
             .catch(function (error) {
