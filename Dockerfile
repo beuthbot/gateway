@@ -1,5 +1,5 @@
 
-FROM node:11-alpine
+FROM node:12
 
 RUN mkdir -p /usr/src/app
 RUN mkdir -p /usr/src/tmp
