@@ -220,8 +220,9 @@ app.start().then(service => {
                     })
                     .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
-                    const convertResult = spawnSync('ffmpeg', ['-i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname + '/tmp/' + timeStamp + 'converted.ogg'])
-                    fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stdout)
+                    const convertResult = spawnSync('avconv', ['-i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -map 0:a -codec:a opus -b:a 100k -vbr on ' + __dirname + '/tmp/' + timeStamp + 'converted.ogg'])
+                    console.log(convertResult)
+                    //fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stdout)
                     fs.readdirSync(__dirname+'/tmp/').forEach(file => {
                         console.log(file);
                     });
