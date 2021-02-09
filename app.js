@@ -213,20 +213,8 @@ app.start().then(service => {
                         // request is finished
                     })
                     .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
-                    //res.sendFile(__dirname+'/app/audioanswer.ogg')
-                    const convertResult = spawnSync('ffmpeg', ['-i ', __dirname + '/tmp/' + timeStamp + '.ogg', '-acodec', 'libopus', __dirname + '/tmp/' + timeStamp + 'converted.ogg', '-y'])
-                    console.log(convertResult)
-                    fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stderr)
-                    fs.readdirSync(__dirname+'/tmp/').forEach(file => {
-                        console.log(file);
-                    });
-                    const playResult = spawnSync('ffplay', [__dirname+'/tmp/' + timeStamp + 'converted.ogg'])
-                    console.log(playResult)
-                    const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
-                    console.log("Converted Exist", exist)
                     messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
                     fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
-                    fs.unlinkSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
                 });
 
             })
