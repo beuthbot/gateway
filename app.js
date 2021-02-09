@@ -101,6 +101,9 @@ app.start().then(service => {
     //todo audio route is pseudo code
     service.fileUploadEndpoint('/audio', function(req, res) {
 
+        const {serviceName, serviceUserId} = req.payload;
+        console.log('gateway request audio from', serviceName, serviceUserId);
+
         //todo execute async
         (()=>{
             const binaryAudio = req.files.file.data; //todo: get binary
@@ -226,7 +229,7 @@ app.start().then(service => {
                 res.json(errorMessage)
                 res.end();
             })
-  //-          
+  //-
         }).call()
 
         return res.setContent('Deine Sprachnachricht wird verarbeitet...');
