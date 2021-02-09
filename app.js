@@ -19,13 +19,14 @@ let messengerService = null;
 
 const util = require('util')
 const cors = require('cors')
+const request = require('request')
+const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 const deconcentrator = require('./app/deconcentrator')
 const registry = require('./app/registry')
 const database = require('./app/database')
-const stt = require('./app/stt');
-const tts = require('./app/tts');
-const { response } = require('express');
+const stt = require('./app/stt')
 
 const config = new AppConfig();
 config.port = 3000;
@@ -38,7 +39,8 @@ const dontKnow = [
     "Das weiß ich nicht.",
     "Kein Ahnung.",
     "Hier bin ich überfragt.",
-    "Da bin ich überfragt."
+    "Da bin ich überfragt.",
+    "..."
 ]
 
 function randomDontKnowAnswer() {
@@ -49,6 +51,20 @@ function randomDontKnowAnswer() {
 app.start().then(service => {
 
     messengerService = new Messenger(service);
+
+    /*
+    console.log('sending test message in 5 seconds')
+    setTimeout(()=>{
+        console.log('send message to client')
+        const dennis = {
+            clients: [
+                {serviceName: 'discord', clientId: '185540011314249729'}
+            ]
+        };
+        // messengerService.send(dennis, 'Test User Messenger')
+        messengerService.sendFile(dennis, __dirname + '/app.js')
+    }, 5000)
+   */
 
     service.expressApp.get('/', function(req, res) {
         res.send('Hello from BeuthBot Gateway')
@@ -87,7 +103,6 @@ app.start().then(service => {
                     {serviceName: serviceName, clientId: serviceUserId}
                 ]
             };
-            var antwort = ""
             const binaryAudio = req.files.file.data; //todo: get binary
             const deconcentratorMessage = {}
             stt.getText(binaryAudio)
@@ -97,9 +112,14 @@ app.start().then(service => {
                     messengerService.send(user, 'Ich habe verstanden: "' + text + '"')
                     // guard the existence of a valid text content
                     if (!text || text.length < 1) {
-                        const errorMessage = "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text."
-                        messengerService.send(user, errorMessage)
-                        tts(user, errorMessage, messengerService)
+                        // message.error = "message has no text property"
+                        // message.answer = {
+                        //     "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
+                        //     "history": ["gateway"]
+                        // }
+                        console.log('message doesnt exist')
+                        // res.json(message)
+                        // res.end();
                         return
                     }
                     deconcentratorMessage.text = text
@@ -118,9 +138,13 @@ app.start().then(service => {
             .then(function (deconcentratorResponse) {
 
                 if (!deconcentratorResponse || !deconcentratorResponse.data) {
-                    const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar."
-                    messengerService.send(user, errorMessage)
-                    tts(user, errorMessage, messengerService)
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar.",
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
                     return
                 }
 
@@ -128,9 +152,14 @@ app.start().then(service => {
 
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
-                    const randomResponse = randomDontKnowAnswer()
-                    messengerService.send(user, randomResponse)
-                    tts(user, randomResponse, messengerService)
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": randomDontKnowAnswer(),
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
+
                     return
                 }
 
@@ -150,9 +179,13 @@ app.start().then(service => {
 
                 if (!registryResponse.data) {
                     console.log("no registryResponse.data")
-                    const errorMessage = "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar."
-                    messengerService.send(user, errorMessage)
-                    tts(user, errorMessage, messengerService)
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar.",
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
                     return
                 }
 
@@ -165,7 +198,36 @@ app.start().then(service => {
                 if (registryAnswer.answer && registryAnswer.answer.history) {
                     registryAnswer.answer.history.push('gateway')
                 }
-                tts(user, registryAnswer, messengerService)
+                const timeStamp = Date.now()
+                request.post({
+                        uri: process.env.TTS_ENDPOINT || "http://tts:7003/tts",
+                        method: 'POST',
+                        body: {message: {registryAnswer}},
+                        json: true
+                    }
+                )
+                    .on('error', function (err) {
+                        // error handling
+                    })
+                    .on('finish', function (err) {
+                        // request is finished
+                    })
+                    .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
+                    //res.sendFile(__dirname+'/app/audioanswer.ogg')
+                    const convertResult = spawnSync('ffmpeg', ['-i ', __dirname + '/tmp/' + timeStamp + '.ogg', '-acodec', 'libopus', __dirname + '/tmp/' + timeStamp + 'converted.ogg', '-y'])
+                    console.log(convertResult)
+                    fs.writeFileSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg', convertResult.stderr)
+                    fs.readdirSync(__dirname+'/tmp/').forEach(file => {
+                        console.log(file);
+                    });
+                    const playResult = spawnSync('ffplay', [__dirname+'/tmp/' + timeStamp + 'converted.ogg'])
+                    console.log(playResult)
+                    const exist = fs.existsSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
+                    console.log("Converted Exist", exist)
+                    messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + '.ogg')
+                    fs.unlinkSync(__dirname+'/tmp/' + timeStamp + '.ogg')
+                    fs.unlinkSync(__dirname+'/tmp/' + timeStamp + 'converted.ogg')
+                });
 
             })
             .catch(function (error) {
@@ -299,4 +361,3 @@ app.start().then(service => {
     })
 
 })
-
