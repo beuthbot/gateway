@@ -22,7 +22,7 @@ async function sendAudio(user, text, messengerService){
         // request is finished
     })
     .pipe(fs.createWriteStream('/usr/src/app/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
-        await messengerService.sendFile(user, '/usr/src/app/tmp/' + timeStamp + '.ogg')
+        messengerService.sendFile(user, '/usr/src/app/tmp/' + timeStamp + '.ogg')
         fs.unlinkSync('/usr/src/app/tmp/' + timeStamp + '.ogg')
     });
 }
