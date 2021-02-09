@@ -128,8 +128,9 @@ app.start().then(service => {
 
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
-                    messengerService.send(user, randomDontKnowAnswer())
-                    tts(user, errorMessage, messengerService)
+                    const randomResponse = randomDontKnowAnswer()
+                    messengerService.send(user, randomResponse)
+                    tts(user, randomResponse, messengerService)
                     return
                 }
 
