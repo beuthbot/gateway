@@ -100,9 +100,14 @@ app.start().then(service => {
 
     //todo audio route is pseudo code
     service.fileUploadEndpoint('/audio', function(req, res) {
-        console.log(req.body.userId)
-        //todo execute async
         (()=>{
+            const {serviceName, serviceUserId} = req.payload;
+            console.log('gateway request audio from', serviceName, serviceUserId);
+            const user = {
+                clients: [
+                    {serviceName: serviceName, clientId: serviceUserId}
+                ]
+            };
             const binaryAudio = req.files.file.data; //todo: get binary
             const deconcentratorMessage = {}
             stt.getText(binaryAudio)
@@ -129,7 +134,7 @@ app.start().then(service => {
 
                     return req.get
             })
-            .then(function (user) {
+            .then(function () {
                 // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
                 deconcentratorMessage.user = user
                 return deconcentrator.interpretate(deconcentratorMessage)
@@ -137,13 +142,13 @@ app.start().then(service => {
             .then(function (deconcentratorResponse) {
 
                 if (!deconcentratorResponse || !deconcentratorResponse.data) {
-                    let errorMessage = message
-                    errorMessage.answer = {
-                        "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar.",
-                        "history": ["gateway"]
-                    }
-                    res.json(errorMessage)
-                    res.end()
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Der Deconcentrator ist nicht erreichbar.",
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
                     return
                 }
 
@@ -151,13 +156,13 @@ app.start().then(service => {
 
                 // the bot didn't understand the message
                 if (!intent || !intent.name) {
-                    let errorMessage = message
-                    errorMessage.answer = {
-                        "content": randomDontKnowAnswer(),
-                        "history": ["gateway"]
-                    }
-                    res.json(errorMessage)
-                    res.end()
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": randomDontKnowAnswer(),
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
 
                     return
                 }
@@ -178,13 +183,13 @@ app.start().then(service => {
 
                 if (!registryResponse.data) {
                     console.log("no registryResponse.data")
-                    let errorMessage = message
-                    errorMessage.answer = {
-                        "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar.",
-                        "history": ["gateway"]
-                    }
-                    res.json(errorMessage)
-                    res.end()
+                    // let errorMessage = message
+                    // errorMessage.answer = {
+                    //     "content": "Es tut mir leid. Es ist ein interner Fehler aufgetreten. Die Registry ist nicht erreichbar.",
+                    //     "history": ["gateway"]
+                    // }
+                    // res.json(errorMessage)
+                    // res.end()
                     return
                 }
 
