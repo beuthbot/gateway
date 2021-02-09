@@ -205,7 +205,7 @@ app.start().then(service => {
                 }
 
                 request.post({
-                        uri: process.env.STT_ENDPOINT || "http://tts:7003/tts",
+                        uri: process.env.TTS_ENDPOINT || "http://tts:7003/tts",
                         method: 'POST',
                         body: {message: {registryAnswer}},
                         json: true
