@@ -114,7 +114,7 @@ app.start().then(service => {
                 .then(function (stt_response) {
                     text = stt_response.answer.content
                     console.log(text)
-                    messengerService.send(user, 'Ich habe verstand: "' + text + '"')
+                    messengerService.send(user, 'Ich habe verstanden: "' + text + '"')
                     // guard the existence of a valid text content
                     if (!text || text.length < 1) {
                         // message.error = "message has no text property"
@@ -195,6 +195,9 @@ app.start().then(service => {
                 }
 
                 const registryAnswer = registryResponse.data
+
+                console.log()
+                messengerService.send(user, registryAnswer.answer.content)
 
                 console.debug("registryAnswer:\n" + util.inspect(registryAnswer, false, null, true) + "\n\n")
 
