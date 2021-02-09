@@ -21,6 +21,7 @@ const util = require('util')
 const cors = require('cors')
 const request = require('request')
 const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 const deconcentrator = require('./app/deconcentrator')
 const registry = require('./app/registry')
@@ -219,7 +220,7 @@ app.start().then(service => {
                     })
                     .pipe(fs.createWriteStream(__dirname+'/tmp/' + timeStamp + '.ogg')).on('finish', function (err) {
                     //res.sendFile(__dirname+'/app/audioanswer.ogg')
-                    
+
                     spawnSync('ffmpeg -i ' + __dirname+'/tmp/' + timeStamp + '.ogg' + ' -f wav - | opusenc - ' + __dirname+'/tmp/' + timeStamp + 'converted.ogg') 
                     
                     messengerService.sendFile(user, __dirname + '/tmp/' + timeStamp + 'converted.ogg')
