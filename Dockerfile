@@ -7,6 +7,7 @@ RUN mkdir -p /usr/src/app/tmp
 WORKDIR /usr/src/app
 
 COPY download.sh ./
+COPY test.ogg ./
 RUN sh download.sh
 
 COPY package.json ./
