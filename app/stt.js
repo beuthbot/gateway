@@ -7,7 +7,6 @@
 
 var FormData = require('form-data');
 const Duplex = require('stream').Duplex;
-const fs = require('fs');
 const axios = require('axios')
 const endpoint = process.env.STT_ENDPOINT || "http://stt:7002/stt"
 
@@ -32,20 +31,12 @@ async function getText(file) {
         },
             data : data
         };
-        axios(config)
-        .then(function (response) {
-            return JSON.stringify(response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+        const res = await axios(config)
+        return res.data;
     }
     catch (e) {
-        /* ignored exception, probably 404 */
         console.log(e)
     }
-    console.debug("STT Error")
-    return null
 }
 
 exports.getText = getText

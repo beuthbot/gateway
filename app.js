@@ -100,34 +100,34 @@ app.start().then(service => {
 
     //todo audio route is pseudo code
     service.fileUploadEndpoint('/audio', function(req, res) {
-
+        console.log(req.body.userId)
         //todo execute async
         (()=>{
             const binaryAudio = req.files.file.data; //todo: get binary
-
+            const deconcentratorMessage = {}
             stt.getText(binaryAudio)
-                .then(function (text) {
+                .then(function (stt_response) {
+                    text = stt_response.answer.content
+                    console.log(text)
                     // guard the existence of a valid text content
                     if (!text || text.length < 1) {
-                        message.error = "message has no text property"
-                        message.answer = {
-                            "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
-                            "history": ["gateway"]
-                        }
-                        console.log(message)
+                        // message.error = "message has no text property"
+                        // message.answer = {
+                        //     "content": "Es tut mir leid. Es ist ein interner Fehler im Gateway aufgetreten. Die Nachricht enthält keinen Text.",
+                        //     "history": ["gateway"]
+                        // }
+                        console.log('message doesnt exist')
                         // res.json(message)
                         // res.end();
                         return
                     }
-
-                    const deconcentratorMessage = {}
                     deconcentratorMessage.text = text
 
                     // deconcentratorMessage.min_confidence_score = 0.50
                     deconcentratorMessage.processors = ["rasa"]
                     deconcentratorMessage.history = ["gateway"]
 
-                    return database.getUser(req.getUserId)
+                    return req.get
             })
             .then(function (user) {
                 // console.debug("user:\n" + util.inspect(user, false, null, true) + "\n\n")
@@ -226,8 +226,7 @@ app.start().then(service => {
                 }
                 res.json(errorMessage)
                 res.end();
-            })
-  //-          
+            })     
         }).call()
 
         return res.setContent('Deine Sprachnachricht wird verarbeitet...');
